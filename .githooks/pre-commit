@@ -2,4 +2,16 @@
 
 . "$(dirname "$0")/_lib.sh"
 
-log_skip "skip pre-commit hook"
+if has_staged_changes frontend; then
+  log_pending "running frontend pre-commit checks"
+  make lint-frontend
+  make typecheck-frontend
+fi
+
+if has_staged_changes backend; then
+  log_pending "running backend pre-commit checks"
+  make lint-backend
+  make typecheck-backend
+fi
+
+log_success "pre-commit hook completed"

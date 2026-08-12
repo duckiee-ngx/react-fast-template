@@ -1,6 +1,6 @@
-import { useAuthStore } from "../store"
+import { useAuthStore } from "../store";
 
 export function clearSessionAndRedirect(loginPath = "/auth/login") {
-  useAuthStore.getState().clearAccessToken()
-  window.location.href = loginPath
+  useAuthStore.getState().clearAccessToken();
+  window.location.href = loginPath;
 }

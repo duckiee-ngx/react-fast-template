@@ -46,11 +46,13 @@
       "lineWidth": 100,
       "operatorLinebreak": "after",
       "quoteStyle": "double",
-      "semicolons": "asNeeded",
+      "semicolons": "always",
       "trailingCommas": "all"
     },
     "globals": [],
-    "linter": { "enabled": true }
+    "linter": {
+      "enabled": true
+    }
   },
   "json": {
     "formatter": {

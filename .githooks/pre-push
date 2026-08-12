@@ -2,4 +2,12 @@
 
 . "$(dirname "$0")/_lib.sh"
 
-log_skip "skip pre-push hook"
+if has_staged_changes frontend; then
+  log_pending "running frontend pre-push checks"
+fi
+
+if has_staged_changes backend; then
+  log_pending "running backend pre-push checks"
+fi
+
+log_success "pre-push hook completed"

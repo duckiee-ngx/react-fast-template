@@ -4,6 +4,7 @@
   "ruff.organizeImports": true,
   "biome.enabled": true,
   "biome.requireConfiguration": true,
+  "biome.configurationPath": "${workspaceFolder}/frontend/biome.json",
   "python.defaultInterpreterPath": "${workspaceFolder}/backend/.venv/bin/python",
   "[python]": {
     "editor.defaultFormatter": "charliermarsh.ruff",
@@ -24,8 +25,11 @@
       "source.useSortedProperties": "always"
     },
   },
-  "[json][jsonc][yaml]": {
+  "[json][jsonc]": {
     "editor.defaultFormatter": "vscode.json-language-features"
+  },
+  "[yaml][yml]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "tailwindCSS.classAttributes": [
     "class",

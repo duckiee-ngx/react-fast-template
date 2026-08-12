@@ -19,3 +19,8 @@ log_error() {
 log_skip() {
   echo "${GRAY}⊝ $1 ${RESET}"
 }
+
+has_staged_changes() {
+  [ -n "$(git diff --cached --name-only -- "${1:?}")" ]
+}
+
