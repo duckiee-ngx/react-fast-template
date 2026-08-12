@@ -1,0 +1,37 @@
+{
+  "editor.formatOnSave": true,
+  "ruff.nativeServer": "on",
+  "ruff.organizeImports": true,
+  "biome.enabled": true,
+  "biome.requireConfiguration": true,
+  "python.defaultInterpreterPath": "${workspaceFolder}/backend/.venv/bin/python",
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.codeActionsOnSave": {
+      "source.fixAll.ruff": "explicit",
+      "source.organizeImports.ruff": "explicit",
+    },
+  },
+  "[typescript][typescriptreact][javascript]": {
+    "editor.defaultFormatter": "biomejs.biome",
+    "editor.codeActionsOnSave": {
+      "source.addMissingImports": "always",
+      "source.fixAll.biome": "always",
+      "source.removeUnusedImports": "always",
+      "source.organizeImports": "never",
+      "source.useSortedAttributes": "always",
+      "source.useSortedKeys": "never",
+      "source.useSortedProperties": "always"
+    },
+  },
+  "[json][jsonc][yaml]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  },
+  "tailwindCSS.classAttributes": [
+    "class",
+    "className",
+    "ngClass",
+    ".*ClassName"
+  ],
+  "tailwindCSS.emmetCompletions": true
+}

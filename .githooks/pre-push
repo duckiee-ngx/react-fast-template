@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+
+. "$(dirname "$0")/_lib.sh"
+
+log_skip "skip pre-push hook"
