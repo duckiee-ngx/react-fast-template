@@ -18,6 +18,7 @@ ALEMBIC := $(PM_BE_RUN) alembic
 
 setup:
 	git config core.hooksPath .githooks
+	chmod -R +x .githooks
 
 # ── Install ──────────────────────────────────────────────────────────────────
 

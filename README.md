@@ -44,7 +44,7 @@ Monorepo: FastAPI backend (`backend/`) + React frontend (`frontend/`).
 ## Quick start
 
 ```bash
-# Point git at repo hooks (once per clone)
+# Configure git hooks (once per clone)
 make setup
 
 # Install everything
@@ -91,7 +91,7 @@ All commands run from the repo root via the root `Makefile`.
 
 | Command | Description |
 | --- | --- |
-| `make setup` | Set `core.hooksPath` to `.githooks/` |
+| `make setup` | Configure git hooks |
 | `make install-all` | Install backend + frontend deps |
 | `make install-backend` | `uv sync --dev` in `backend/` |
 | `make install-frontend` | `npm install` in `frontend/` |
