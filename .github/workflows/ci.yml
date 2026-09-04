@@ -93,7 +93,7 @@ jobs:
 
           TEXT="<b>${ICON} CI ${STATUS}</b>
           ────────
-          Repo: <a href=\"${{ github.server_url }}/${{ github.repository }}">${{ github.repository }}</a>
+          Repo: <a href=\"${{ github.server_url }}/${{ github.repository }}\">${{ github.repository }}</a>
           Branch: <a href=\"${{ github.server_url }}/${{ github.repository }}/tree/${{ github.ref_name }}\">${{ github.ref_name }}</a>
           Commit: <a href=\"${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}\">${GITHUB_SHA:0:7}</a>
           Actor: ${{ github.actor }}
