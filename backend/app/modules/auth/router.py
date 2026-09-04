@@ -34,5 +34,5 @@ async def logout(body: LogoutRequest, service: AuthServiceDep) -> None:
 
 
 @router.get("/verify", response_model=UserResponse)
-async def verify(token: str, service: AuthServiceDep) -> None:
+async def verify(token: str, service: AuthServiceDep) -> User:
     return await service.verify(token)
