@@ -4,7 +4,10 @@ import { loginMapper, refreshTokenMapper } from "./mapper";
 import type { LoginRequest } from "./schemas";
 
 export const login = async (body: LoginRequest) => {
-  const response = await httpClient.post(AUTH_API_ENDPOINTS.LOGIN, loginMapper.toRequest(body));
+  const response = await httpClient.post(
+    AUTH_API_ENDPOINTS.LOGIN,
+    loginMapper.toRequest(body),
+  );
   return loginMapper.fromResponse(response.data);
 };
 

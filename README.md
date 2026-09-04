@@ -102,13 +102,13 @@ All commands run from the repo root via the root `Makefile`.
 | `make downgrade` | Roll back one revision |
 | `make history` | Show migration history |
 | `make current` | Show current revision |
-| `make lint-backend` | Ruff check |
+| `make check-backend` | Ruff check |
 | `make fix-backend` | Ruff check + autofix |
 | `make typecheck-backend` | mypy |
-| `make lint-frontend` | Biome check |
-| `make format-frontend` | Biome format |
+| `make check-frontend` | Biome check |
+| `make fix-frontend` | Biome format |
 | `make typecheck-frontend` | TypeScript build-mode check |
-| `make lint-all` | Lint backend + frontend |
+| `make check-all` | Check backend + frontend |
 | `make typecheck-all` | Typecheck backend + frontend |
 
 Or run tools directly:
@@ -125,8 +125,8 @@ uv run mypy .
 cd frontend
 npm install
 npm run start
-npm run lint
-npm run format
+npm run check
+npm run fix
 npm run typecheck
 npm run build
 npm run preview

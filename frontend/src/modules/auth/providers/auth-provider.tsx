@@ -9,7 +9,11 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   const { mutate: refreshTokenMutate } = useRefreshTokenMutation();
 
   useEffect(() => {
-    if (UNAUTHORIZED_PATHS.includes(window.location.pathname as keyof FileRoutesByFullPath)) {
+    if (
+      UNAUTHORIZED_PATHS.includes(
+        window.location.pathname as keyof FileRoutesByFullPath,
+      )
+    ) {
       setBootstrapped(true);
       return;
     }

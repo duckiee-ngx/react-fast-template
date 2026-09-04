@@ -10,9 +10,9 @@ ALEMBIC := $(PM_BE_RUN) alembic
 	install-frontend install-backend install-all \
 	start-frontend start-backend \
 	migration upgrade downgrade history current \
-	lint-backend fix-backend typecheck-backend \
-	lint-frontend format-frontend typecheck-frontend \
-	lint-all typecheck-all
+	check-backend fix-backend typecheck-backend \
+	check-frontend fix-frontend typecheck-frontend \
+	check-all typecheck-all
 
 # ── Setup ──────────────────────────────────────────────────────────────
 
@@ -57,7 +57,7 @@ current:
 
 # ── Backend: quality ─────────────────────────────────────────────────────────
 
-lint-backend:
+check-backend:
 	$(PM_BE_RUN) ruff check .
 
 fix-backend:
@@ -68,17 +68,17 @@ typecheck-backend:
 
 # ── Frontend: quality ────────────────────────────────────────────────────────
 
-lint-frontend:
-	$(PM_FE_RUN) lint
+check-frontend:
+	$(PM_FE_RUN) check
 
-format-frontend:
-	$(PM_FE_RUN) format
+fix-frontend:
+	$(PM_FE_RUN) fix
 
 typecheck-frontend:
 	$(PM_FE_RUN) typecheck
 
 # ── Combined quality ─────────────────────────────────────────────────────────
 
-lint-all: lint-backend lint-frontend
+check-all: check-backend check-frontend
 
 typecheck-all: typecheck-backend typecheck-frontend

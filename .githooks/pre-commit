@@ -4,13 +4,13 @@
 
 if has_staged_changes frontend; then
   log_pending "running frontend pre-commit checks"
-  make lint-frontend
+  make check-frontend
   make typecheck-frontend
 fi
 
 if has_staged_changes backend; then
   log_pending "running backend pre-commit checks"
-  make lint-backend
+  make check-backend
   make typecheck-backend
 fi
 
