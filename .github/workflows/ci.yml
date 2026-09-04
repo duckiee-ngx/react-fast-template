@@ -95,7 +95,7 @@ jobs:
           ────────
           <b>Pipeline</b>: <a href=\"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\">${{ github.run_id }}</a>
           <b>Actor</b>: <code>${{ github.actor }}</code>
-          <b>Repo</b>: <code>${{ github.repository }}</code>
+          <b>Repo</b>: <code>${{ github.event.repository.name }}</code>
           <b>Branch</b>: <code>${{ github.ref_name }}</code>
           <b>Commit</b>: <code>${GITHUB_SHA:0:7}</code>"
 
