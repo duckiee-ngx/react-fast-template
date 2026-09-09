@@ -1,23 +1,29 @@
 import { useEffect, useRef } from "react";
 
-export function useClickOutside(callback?: () => void) {
-  const nodeRef = useRef<HTMLDivElement>(null);
+export function useClickOutside<T extends HTMLElement = HTMLElement>(
+  callback?: () => void,
+) {
+  const nodeRef = useRef<T>(null);
+  const callbackRef = useRef(callback);
+  callbackRef.current = callback;
 
   useEffect(() => {
-    function handleClickOutSide(this: Document, ev: MouseEvent) {
-      if (nodeRef.current && !nodeRef.current.contains(ev.target as Node)) {
-        callback?.();
+    function handlePointerDown(event: PointerEvent) {
+      if (event.pointerType === "mouse" && event.button !== 0) return;
+
+      const node = nodeRef.current;
+      const target = event.target;
+      if (node && target instanceof Node && !node.contains(target)) {
+        callbackRef.current?.();
       }
     }
 
-    document.addEventListener("mouseup", handleClickOutSide);
+    document.addEventListener("pointerdown", handlePointerDown);
 
     return () => {
-      document.removeEventListener("mouseup", handleClickOutSide);
+      document.removeEventListener("pointerdown", handlePointerDown);
     };
-  }, [callback]);
+  }, []);
 
-  return {
-    nodeRef,
-  };
+  return { nodeRef };
 }

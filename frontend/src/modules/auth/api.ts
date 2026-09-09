@@ -16,6 +16,10 @@ export const logout = async () => {
 };
 
 export const refreshToken = async () => {
+  return refreshTokenMapper.fromResponse({
+    accessToken: "test",
+    refreshToken: "test",
+  });
   const response = await httpClient.post(AUTH_API_ENDPOINTS.REFRESH_TOKEN);
   return refreshTokenMapper.fromResponse(response.data);
 };

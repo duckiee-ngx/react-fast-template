@@ -1,12 +1,19 @@
+import { registerSessionNavigator } from "@src/modules/auth/utils/session";
 import {
   createRouter,
   RouterProvider as TanstackRouterProvider,
 } from "@tanstack/react-router";
-// Import the generated route tree
 import { routeTree } from "../routeTree.gen";
+import { queryClient } from "./query-provider";
 
-// Create a new router instance
-const router = createRouter({ routeTree });
+const router = createRouter({
+  routeTree,
+  context: { queryClient },
+});
+
+registerSessionNavigator(() => {
+  void router.navigate({ to: "/login", replace: true });
+});
 
 // Register the router instance for type safety
 declare module "@tanstack/react-router" {

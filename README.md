@@ -13,7 +13,7 @@ Monorepo: FastAPI backend (`backend/`) + React frontend (`frontend/`).
 
 | Layer | Technology |
 | --- | --- |
-| Runtime | Python `>=3.14` |
+| Runtime | Python `>=3.14` (see `backend/.python-version`) |
 | Package manager | [uv](https://github.com/astral-sh/uv) |
 | Web framework | FastAPI + Uvicorn |
 | ORM / DB | SQLAlchemy 2 + asyncpg (PostgreSQL) |
@@ -27,8 +27,8 @@ Monorepo: FastAPI backend (`backend/`) + React frontend (`frontend/`).
 
 | Layer | Technology |
 | --- | --- |
-| Runtime | Node.js `^20.19.0 \|\| ^22.12.0` (see `frontend/package.json` `engines`) |
-| Package manager | npm (swap via `PM_FE` in root `Makefile`) |
+| Runtime | Node.js `22` (see `frontend/.nvmrc`; `engines` also allow `^20.19.0`) |
+| Package manager | npm (swap via `FE_PM` in root `Makefile`) |
 | Bundler / dev server | Vite |
 | UI library | React 19 |
 | Routing | TanStack Router |
@@ -44,22 +44,14 @@ Monorepo: FastAPI backend (`backend/`) + React frontend (`frontend/`).
 ## Quick start
 
 ```bash
-# Configure git hooks (once per clone)
-make setup
+# Install deps and create .env files
+make setup-all
 
-# Install everything
-make install-all
-
-# Backend env
-cp backend/.env.example backend/.env
-# Fill in Postgres, Redis, and JWT settings
-
-# Frontend env
-cp frontend/.env.example frontend/.env
-# Set VITE_API_URL (must be a valid URL; validated at startup via Zod)
+# Fill in backend/.env (Postgres, Redis, JWT)
+# Confirm frontend/.env has a valid VITE_API_URL
 
 # Run migrations
-make upgrade
+make upgrade-backend
 
 # Start (separate terminals)
 make start-backend
@@ -68,6 +60,15 @@ make start-frontend
 
 - API docs: `http://127.0.0.1:8000/docs`
 - App: `http://127.0.0.1:3000`
+
+List all Make targets: `make help`.
+
+Git hooks live in `.githooks/` (pre-commit runs check + typecheck for changed sides). Enable once per clone:
+
+```bash
+git config core.hooksPath .githooks
+chmod -R +x .githooks
+```
 
 ## Environment
 
@@ -91,32 +92,31 @@ All commands run from the repo root via the root `Makefile`.
 
 | Command | Description |
 | --- | --- |
-| `make setup` | Configure git hooks |
-| `make install-all` | Install backend + frontend deps |
-| `make install-backend` | `uv sync --dev` in `backend/` |
-| `make install-frontend` | `npm install` in `frontend/` |
-| `make start-backend` | Uvicorn with `--reload` |
+| `make help` | List targets |
+| `make setup-all` | Install frontend + backend deps and create `.env` files |
+| `make setup-frontend` | `npm install` + copy `frontend/.env` if missing |
+| `make setup-backend` | `uv sync --dev` + copy `backend/.env` if missing |
 | `make start-frontend` | Vite dev server |
-| `make migration msg="..."` | Create an Alembic migration (autogenerate) |
-| `make upgrade` | Apply migrations to `head` |
-| `make downgrade` | Roll back one revision |
-| `make history` | Show migration history |
-| `make current` | Show current revision |
+| `make start-backend` | Uvicorn with `--reload` |
+| `make revision-backend msg="..."` | Create an Alembic migration (autogenerate) |
+| `make upgrade-backend` | Apply migrations to `head` |
+| `make downgrade-backend` | Roll back one revision |
+| `make check-frontend` | Biome check |
+| `make fix-frontend` | Biome check + write |
+| `make typecheck-frontend` | TypeScript build-mode check |
 | `make check-backend` | Ruff check |
 | `make fix-backend` | Ruff check + autofix |
 | `make typecheck-backend` | mypy |
-| `make check-frontend` | Biome check |
-| `make fix-frontend` | Biome format |
-| `make typecheck-frontend` | TypeScript build-mode check |
-| `make check-all` | Check backend + frontend |
-| `make typecheck-all` | Typecheck backend + frontend |
+| `make check-all` | Check frontend + backend |
+| `make fix-all` | Auto-fix frontend + backend |
+| `make typecheck-all` | Typecheck frontend + backend |
 
 Or run tools directly:
 
 ```bash
 # Backend
 cd backend
-uv run uvicorn app.main:app --reload --no-access-log
+uv run uvicorn app.main:app --reload
 uv run alembic upgrade head
 uv run ruff check .
 uv run mypy .
@@ -131,6 +131,15 @@ npm run typecheck
 npm run build
 npm run preview
 ```
+
+## CI
+
+`.github/workflows/ci.yml` runs on `push` / `pull_request` to `master`.
+
+- Detects changes under `frontend/` and `backend/`
+- Frontend: `npm ci`, `npm run check`, `npm run typecheck`
+- Backend: `uv sync --dev`, `ruff check`, `mypy`
+- Telegram notify (optional): set repo secrets `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, `TELEGRAM_THREAD_ID`
 
 ## Docker
 
@@ -152,7 +161,7 @@ docker run --rm -p 3000:80 react-fast-template-frontend
 
 App: `http://127.0.0.1:3000` (same port as local Vite)
 
-Verify SPA routing: open `/auth/login` and refresh — nginx should still serve the app (not a raw 404).
+Verify SPA routing: open `/login` and refresh — nginx should still serve the app (not a raw 404).
 
 ### Backend
 
@@ -173,7 +182,6 @@ react-fast-template/
 │
 ├── Makefile
 ├── README.md
-├── docker-compose.yaml
 │
 ├── .githooks/
 │   ├── _lib.sh
@@ -182,54 +190,22 @@ react-fast-template/
 │
 ├── .github/
 │   └── workflows/
-│       ├── ci.yml
-│       └── cd.yml
+│       └── ci.yml
 │
 ├── backend/
 │   ├── app/
 │   │   ├── core/
-│   │   │   ├── config.py
-│   │   │   ├── database.py
-│   │   │   ├── redis.py
-│   │   │   ├── security.py
-│   │   │   ├── logging.py
-│   │   │   ├── exception.py
-│   │   │   └── dependency.py
-│   │   │
 │   │   ├── common/
-│   │   │   ├── base_model.py
-│   │   │   ├── base_schema.py
-│   │   │   ├── base_repository.py
-│   │   │   ├── pagination.py
-│   │   │   ├── response.py
-│   │   │   └── utils.py
-│   │   │
 │   │   ├── modules/
 │   │   │   ├── auth/
-│   │   │   │   ├── dependency.py
-│   │   │   │   ├── schema.py
-│   │   │   │   ├── repository.py
-│   │   │   │   ├── service.py
-│   │   │   │   └── router.py
 │   │   │   └── users/
-│   │   │       ├── model.py
-│   │   │       ├── dependency.py
-│   │   │       ├── schema.py
-│   │   │       ├── repository.py
-│   │   │       ├── service.py
-│   │   │       └── router.py
-│   │   │
 │   │   ├── middleware/
-│   │   │   ├── cors.py
-│   │   │   └── logging.py
 │   │   ├── main.py
 │   │   └── router.py
-│   │
 │   ├── alembic/
-│   │   └── versions/
 │   ├── worker/
-│   │   └── tasks.py
 │   ├── .env.example
+│   ├── .python-version
 │   ├── Dockerfile
 │   ├── alembic.ini
 │   ├── pyproject.toml
@@ -241,45 +217,23 @@ react-fast-template/
     │   │   └── env.ts
     │   ├── modules/
     │   │   └── auth/
-    │   │       ├── providers/
-    │   │       │   └── auth-provider.tsx
-    │   │       ├── utils/
-    │   │       │   └── session.ts
-    │   │       ├── api.ts
-    │   │       ├── constants.ts
-    │   │       ├── mapper.ts
-    │   │       ├── query.ts
-    │   │       ├── schemas.ts
-    │   │       └── store.ts
     │   ├── providers/
-    │   │   ├── query-provider.tsx
-    │   │   └── router-provider.tsx
     │   ├── routes/
-    │   │   ├── auth/
-    │   │   │   └── login.tsx
+    │   │   ├── _protected.tsx
+    │   │   ├── _protected/
+    │   │   ├── _public.tsx
+    │   │   ├── _public/
     │   │   ├── __root.tsx
     │   │   └── index.tsx
     │   ├── shared/
-    │   │   ├── api/
-    │   │   │   └── http-client.ts
-    │   │   ├── hooks/
-    │   │   │   ├── use-click-outside.ts
-    │   │   │   └── use-debounce.ts
-    │   │   └── utils/
-    │   │       └── cn.ts
     │   ├── App.tsx
     │   ├── main.tsx
-    │   ├── index.css
     │   └── routeTree.gen.ts
-    │
-    ├── public/
-    ├── index.html
     ├── .env.example
+    ├── .nvmrc
     ├── biome.json
     ├── Dockerfile
     ├── nginx.conf
     ├── package.json
-    ├── tsr.config.json
-    ├── vite.config.ts
-    └── tsconfig.json
+    └── vite.config.ts
 ```
