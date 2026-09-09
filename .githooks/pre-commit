@@ -3,14 +3,16 @@
 . "$(dirname "$0")/_lib.sh"
 
 if has_staged_changes frontend; then
-  log_pending "running frontend pre-commit checks"
+  log_pending "[frontend] running lint + format checks"
   make check-frontend
+  log_pending "[frontend] running type checks"
   make typecheck-frontend
 fi
 
 if has_staged_changes backend; then
-  log_pending "running backend pre-commit checks"
+  log_pending "[backend] running lint + format checks"
   make check-backend
+  log_pending "[backend] running type checks"
   make typecheck-backend
 fi
 
