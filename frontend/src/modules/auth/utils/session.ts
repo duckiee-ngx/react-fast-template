@@ -1,5 +1,5 @@
 import { queryClient } from "@src/providers/query-provider";
-import { refreshToken } from "../api";
+import { logout, refreshToken } from "../api";
 import { useAuthStore } from "../store";
 
 let inflight: Promise<boolean> | null = null;
@@ -16,6 +16,13 @@ export function clearSessionAndRedirect() {
   useAuthStore.getState().clearAccessToken();
   queryClient.clear();
   goLogin?.();
+}
+
+export async function logoutAndClearSession() {
+  clearSessionAndRedirect();
+  await logout().catch(() => {
+    // Session already cleared; logout is best-effort (cookie may already be invalid).
+  });
 }
 
 export function ensureSession(): Promise<boolean> {

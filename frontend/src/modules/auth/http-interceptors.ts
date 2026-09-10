@@ -1,14 +1,11 @@
-import { env } from "@src/configs/env";
 import type {
   AxiosError,
   AxiosInstance,
   InternalAxiosRequestConfig,
 } from "axios";
-import axios from "axios";
-import { AUTH_API_ENDPOINTS } from "./constants";
-import { refreshTokenMapper } from "./mapper";
+import { refreshToken } from "./api";
 import { useAuthStore } from "./store";
-import { clearSessionAndRedirect } from "./utils/session";
+import { logoutAndClearSession } from "./utils/session";
 
 interface RetryRequestConfig extends InternalAxiosRequestConfig {
   _retry?: boolean;
@@ -35,29 +32,6 @@ const processQueue = (error: unknown, token?: string) => {
   });
 };
 
-async function handleRefreshToken() {
-  const response = await axios.post(
-    `${env.VITE_API_URL}${AUTH_API_ENDPOINTS.REFRESH_TOKEN}`,
-    {},
-    { withCredentials: true },
-  );
-  return refreshTokenMapper.fromResponse(response.data);
-}
-
-async function handleLogout() {
-  try {
-    await axios.post(
-      `${env.VITE_API_URL}${AUTH_API_ENDPOINTS.LOGOUT}`,
-      {},
-      { withCredentials: true },
-    );
-  } catch {
-    // ignore
-  } finally {
-    clearSessionAndRedirect();
-  }
-}
-
 export function attachAuthInterceptors(axiosInstance: AxiosInstance) {
   axiosInstance.interceptors.request.use((config) => {
     const accessToken = useAuthStore.getState().accessToken;
@@ -72,18 +46,10 @@ export function attachAuthInterceptors(axiosInstance: AxiosInstance) {
     async (error: AxiosError) => {
       const originalRequest = error.config as RetryRequestConfig;
 
-      // Treat 401 as an expired access token and try refresh (skip auth URLs
-      // to avoid a retry loop). When the API distinguishes expired vs forbidden,
-      // gate this on the error body instead of status alone.
+      // Treat 401 as expired access token and try refresh.
+      // Auth endpoints use a separate authClient (no interceptors), so no URL skip needed.
+      // When the API distinguishes expired vs forbidden, gate on the error body.
       if (error.response?.status !== 401 || originalRequest._retry) {
-        return Promise.reject(error);
-      }
-
-      if (
-        originalRequest.url?.includes(AUTH_API_ENDPOINTS.LOGIN) ||
-        originalRequest.url?.includes(AUTH_API_ENDPOINTS.REFRESH_TOKEN) ||
-        originalRequest.url?.includes(AUTH_API_ENDPOINTS.LOGOUT)
-      ) {
         return Promise.reject(error);
       }
 
@@ -103,7 +69,7 @@ export function attachAuthInterceptors(axiosInstance: AxiosInstance) {
       isRefreshing = true;
 
       try {
-        const data = await handleRefreshToken();
+        const data = await refreshToken();
         const newAccessToken = data.accessToken;
         useAuthStore.getState().setAccessToken(newAccessToken);
         processQueue(null, newAccessToken);
@@ -111,7 +77,7 @@ export function attachAuthInterceptors(axiosInstance: AxiosInstance) {
         return axiosInstance(originalRequest);
       } catch (err) {
         processQueue(err);
-        await handleLogout();
+        await logoutAndClearSession();
         return Promise.reject(err);
       } finally {
         isRefreshing = false;

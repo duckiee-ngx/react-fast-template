@@ -1,7 +1,7 @@
 import { env } from "@src/configs/env";
 import axios from "axios";
 
-const createAxiosInstance = (baseURL: string) => {
+export const createAxiosInstance = (baseURL: string) => {
   const axiosInstance = axios.create({
     baseURL,
     withCredentials: true,

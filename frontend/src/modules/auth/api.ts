@@ -1,10 +1,13 @@
-import { httpClient } from "@src/shared/api/http-client";
+import { env } from "@src/configs/env";
+import { createAxiosInstance } from "@src/shared/api/http-client";
 import { AUTH_API_ENDPOINTS } from "./constants";
 import { loginMapper, refreshTokenMapper } from "./mapper";
 import type { LoginRequest } from "./schemas";
 
+const authClient = createAxiosInstance(env.VITE_API_URL);
+
 export const login = async (body: LoginRequest) => {
-  const response = await httpClient.post(
+  const response = await authClient.post(
     AUTH_API_ENDPOINTS.LOGIN,
     loginMapper.toRequest(body),
   );
@@ -12,10 +15,10 @@ export const login = async (body: LoginRequest) => {
 };
 
 export const logout = async () => {
-  return await httpClient.post(AUTH_API_ENDPOINTS.LOGOUT);
+  return await authClient.post(AUTH_API_ENDPOINTS.LOGOUT);
 };
 
 export const refreshToken = async () => {
-  const response = await httpClient.post(AUTH_API_ENDPOINTS.REFRESH_TOKEN);
+  const response = await authClient.post(AUTH_API_ENDPOINTS.REFRESH_TOKEN);
   return refreshTokenMapper.fromResponse(response.data);
 };

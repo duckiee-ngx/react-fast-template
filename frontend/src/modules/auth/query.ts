@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
-import { login, logout } from "./api";
+import { login } from "./api";
 import { useAuthStore } from "./store";
-import { clearSessionAndRedirect } from "./utils/session";
+import { logoutAndClearSession } from "./utils/session";
 
 export const useLoginMutation = () => {
   return useMutation({
@@ -14,7 +14,6 @@ export const useLoginMutation = () => {
 
 export const useLogoutMutation = () => {
   return useMutation({
-    mutationFn: logout,
-    onSettled: () => clearSessionAndRedirect(),
+    mutationFn: logoutAndClearSession,
   });
 };
